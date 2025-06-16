@@ -1,7 +1,7 @@
 // swift-interface-format-version: 1.0
 // swift-compiler-version: Apple Swift version 6.1 effective-5.10 (swiftlang-6.1.0.110.21 clang-1700.0.13.3)
 // swift-module-flags: -target arm64-apple-ios13.0 -enable-objc-interop -enable-library-evolution -swift-version 5 -enforce-exclusivity=checked -O -enable-experimental-feature DebugDescriptionMacro -enable-bare-slash-regex -module-name IAnalyticsSDK
-// swift-module-flags-ignorable:  -interface-compiler-version 6.1
+// swift-module-flags-ignorable: -no-verify-emitted-module-interface -interface-compiler-version 6.1
 import AdSupport
 import AppTrackingTransparency
 import SystemConfiguration.CaptiveNetwork
@@ -19,49 +19,6 @@ import WebKit
 import _Concurrency
 import _StringProcessing
 import _SwiftConcurrencyShims
-@_hasMissingDesignatedInitializers public class CommonParams {
-  public static let shared: IAnalyticsSDK.CommonParams
-  public func getBaseInfo() -> [Swift.String : Any]
-  public func getDeviceInfo() -> [Swift.String : Any]
-  public func getOSInfo() -> [Swift.String : Any]
-  public func getScreenInfo() -> [Swift.String : Any]
-  public func getPerformanceInfo() -> [Swift.String : Any]
-  public func getAllCommonParams() -> [Swift.String : Any]
-  @objc deinit
-}
-@_hasMissingDesignatedInitializers public class AutoEventTracker {
-  public static let shared: IAnalyticsSDK.AutoEventTracker
-  public func enable()
-  public func disable()
-  public func trackViewController(_ viewController: UIKit.UIViewController)
-  public func handlePageView(_ viewController: UIKit.UIViewController)
-  @objc deinit
-}
-@_hasMissingDesignatedInitializers public class NetworkService {
-  public static func get(request: IAnalyticsSDK.NetworkRequest, completion: @escaping (IAnalyticsSDK.NetworkResponse) -> Swift.Void)
-  public static func post(request: IAnalyticsSDK.NetworkRequest, completion: @escaping (IAnalyticsSDK.NetworkResponse) -> Swift.Void)
-  @objc deinit
-}
-@objc public protocol NetDelegate {
-  @objc optional func networkFlow(networkFlow: IAnalyticsSDK.NetworkFlow, catchWithWifiSend wifiSend: Swift.UInt32, wifiReceived: Swift.UInt32, wwanSend: Swift.UInt32, wwanReceived: Swift.UInt32)
-}
-@objc @_inheritsConvenienceInitializers open class NetworkFlow : ObjectiveC.NSObject {
-  weak open var delegate: (any IAnalyticsSDK.NetDelegate)?
-  open func open(with timeInterval: Foundation.TimeInterval = 1)
-  open func close()
-  @objc override dynamic public init()
-  @objc deinit
-}
-@_hasMissingDesignatedInitializers public class DataCompressor {
-  public static func compress(data: Foundation.Data) -> Foundation.Data
-  public static func decompress(data: Foundation.Data) -> Foundation.Data
-  @objc deinit
-}
-public class NetworkReachability {
-  public init?(hostName: Swift.String)
-  public func isReachable() -> Swift.Bool
-  @objc deinit
-}
 @objc public protocol FPSDelegate {
   @objc optional func fps(fps: IAnalyticsSDK.FPS, currentFPS: Swift.Double)
 }
@@ -80,7 +37,6 @@ public class NetworkReachability {
   public typealias DeepLinkHandlerObjC = @convention(block) (Foundation.NSURL, Foundation.NSDictionary) -> Swift.Void
   @objc public func initialize(apiKey: Swift.String, clientId: Swift.String, aesSecret: Swift.String, apiUrl: Swift.String, debugMode: Swift.Bool = false, environment: Swift.String = "PRODUCTION", enableAdaptiveThrottling: Swift.Bool = true, initialUploadThreshold: Swift.Int = 20, initialUploadInterval: Swift.Int64 = 60000)
   @objc public func trackFirstLaunchEvent()
-  @objc public func trackAppLaunch(isColdStart: Swift.Bool)
   @objc public func getFirstInstallTime() -> Foundation.Date?
   @objc public func resetFirstInstallStatus()
   @objc public func getClipboardPermissionStatus() -> Swift.Bool
@@ -134,6 +90,8 @@ public class NetworkReachability {
   @objc public func getAllDeviceProperties() -> [Swift.String : Any]
   @objc public func getUserAgentString() -> Swift.String
   @objc public func getUtmParams() -> [Swift.String : Any]
+  @objc public func trackEventWithEventName(_ eventName: Swift.String, params: [Swift.String : Any]? = nil)
+  @objc public func trackPageWithPageName(_ pageName: Swift.String, params: [Swift.String : Any]? = nil)
   @objc deinit
 }
 extension IAnalyticsSDK.AnalyticsSDK {
@@ -162,6 +120,56 @@ public struct NetworkHealthResult {
   public func error(_ message: Swift.String)
   public static func setup()
   @objc deinit
+}
+@_hasMissingDesignatedInitializers public class APIConfig {
+  public static let shared: IAnalyticsSDK.APIConfig
+  public func setAPIVersion(_ version: Swift.String)
+  public func setTimeout(_ timeout: Foundation.TimeInterval)
+  public func setReadTimeout(_ timeout: Foundation.TimeInterval)
+  public func setConnectTimeout(_ timeout: Foundation.TimeInterval)
+  public func setMaxConcurrentRequests(_ count: Swift.Int)
+  public func addCustomHeader(_ key: Swift.String, value: Swift.String)
+  public func addCustomHeaders(_ headers: [Swift.String : Swift.String])
+  public func removeCustomHeader(_ key: Swift.String)
+  public func getAllHeaders() -> [Swift.String : Swift.String]
+  public func setRetryConfig(maxCount: Swift.Int, interval: Foundation.TimeInterval, backoffMultiplier: Swift.Double = 2.0)
+  public func setRetryableStatusCodes(_ codes: Swift.Set<Swift.Int>)
+  public func setCacheConfig(enabled: Swift.Bool, sizeInMB: Swift.Int, expirationInSeconds: Foundation.TimeInterval)
+  public func setCompressionConfig(requestEnabled: Swift.Bool, responseEnabled: Swift.Bool, threshold: Swift.Int)
+  public func setSSLVerification(_ enabled: Swift.Bool)
+  public func addCustomCertificate(_ certificate: Foundation.Data)
+  public func enableCertificatePinning(_ enabled: Swift.Bool)
+  public func setLoggingConfig(requestEnabled: Swift.Bool, responseEnabled: Swift.Bool, level: IAnalyticsSDK.APILogLevel)
+  public func setProxyConfig(_ config: IAnalyticsSDK.ProxyConfig?)
+  public func addRequestInterceptor(_ interceptor: any IAnalyticsSDK.RequestInterceptor)
+  public func addResponseInterceptor(_ interceptor: any IAnalyticsSDK.ResponseInterceptor)
+  public func getRequestInterceptors() -> [any IAnalyticsSDK.RequestInterceptor]
+  public func getResponseInterceptors() -> [any IAnalyticsSDK.ResponseInterceptor]
+  public func buildURL(_ path: Swift.String) -> Foundation.URL?
+  public func buildURL(_ path: Swift.String, parameters: [Swift.String : Any]) -> Foundation.URL?
+  public func setApiKey(_ apiKey: Swift.String)
+  public func setClientId(_ clientId: Swift.String)
+  @objc deinit
+}
+public enum APILogLevel : Swift.Int {
+  case none
+  case basic
+  case headers
+  case body
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public struct ProxyConfig {
+  public init(host: Swift.String, port: Swift.Int, username: Swift.String? = nil, password: Swift.String? = nil)
+}
+public protocol RequestInterceptor {
+  func intercept(request: inout Foundation.URLRequest) throws
+}
+public protocol ResponseInterceptor {
+  func intercept(response: Foundation.URLResponse?, data: Foundation.Data?, error: (any Swift.Error)?) -> (Foundation.URLResponse?, Foundation.Data?, (any Swift.Error)?)
 }
 @_hasMissingDesignatedInitializers public class DebugMode {
   public static let shared: IAnalyticsSDK.DebugMode
@@ -220,6 +228,16 @@ public enum NetworkType : Swift.String {
     get
   }
   @objc override dynamic public init()
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers public class CommonParams {
+  public static let shared: IAnalyticsSDK.CommonParams
+  public func getBaseInfo() -> [Swift.String : Any]
+  public func getDeviceInfo() -> [Swift.String : Any]
+  public func getOSInfo() -> [Swift.String : Any]
+  public func getScreenInfo() -> [Swift.String : Any]
+  public func getPerformanceInfo() -> [Swift.String : Any]
+  public func getAllCommonParams() -> [Swift.String : Any]
   @objc deinit
 }
 public struct NetworkResponse {
@@ -862,56 +880,6 @@ public protocol StatusBarConfigurator {
   public static func uploadEventContent(events: [[Swift.String : Any]])
   @objc deinit
 }
-@_hasMissingDesignatedInitializers public class APIConfig {
-  public static let shared: IAnalyticsSDK.APIConfig
-  public func setAPIVersion(_ version: Swift.String)
-  public func setTimeout(_ timeout: Foundation.TimeInterval)
-  public func setReadTimeout(_ timeout: Foundation.TimeInterval)
-  public func setConnectTimeout(_ timeout: Foundation.TimeInterval)
-  public func setMaxConcurrentRequests(_ count: Swift.Int)
-  public func addCustomHeader(_ key: Swift.String, value: Swift.String)
-  public func addCustomHeaders(_ headers: [Swift.String : Swift.String])
-  public func removeCustomHeader(_ key: Swift.String)
-  public func getAllHeaders() -> [Swift.String : Swift.String]
-  public func setRetryConfig(maxCount: Swift.Int, interval: Foundation.TimeInterval, backoffMultiplier: Swift.Double = 2.0)
-  public func setRetryableStatusCodes(_ codes: Swift.Set<Swift.Int>)
-  public func setCacheConfig(enabled: Swift.Bool, sizeInMB: Swift.Int, expirationInSeconds: Foundation.TimeInterval)
-  public func setCompressionConfig(requestEnabled: Swift.Bool, responseEnabled: Swift.Bool, threshold: Swift.Int)
-  public func setSSLVerification(_ enabled: Swift.Bool)
-  public func addCustomCertificate(_ certificate: Foundation.Data)
-  public func enableCertificatePinning(_ enabled: Swift.Bool)
-  public func setLoggingConfig(requestEnabled: Swift.Bool, responseEnabled: Swift.Bool, level: IAnalyticsSDK.APILogLevel)
-  public func setProxyConfig(_ config: IAnalyticsSDK.ProxyConfig?)
-  public func addRequestInterceptor(_ interceptor: any IAnalyticsSDK.RequestInterceptor)
-  public func addResponseInterceptor(_ interceptor: any IAnalyticsSDK.ResponseInterceptor)
-  public func getRequestInterceptors() -> [any IAnalyticsSDK.RequestInterceptor]
-  public func getResponseInterceptors() -> [any IAnalyticsSDK.ResponseInterceptor]
-  public func buildURL(_ path: Swift.String) -> Foundation.URL?
-  public func buildURL(_ path: Swift.String, parameters: [Swift.String : Any]) -> Foundation.URL?
-  public func setApiKey(_ apiKey: Swift.String)
-  public func setClientId(_ clientId: Swift.String)
-  @objc deinit
-}
-public enum APILogLevel : Swift.Int {
-  case none
-  case basic
-  case headers
-  case body
-  public init?(rawValue: Swift.Int)
-  public typealias RawValue = Swift.Int
-  public var rawValue: Swift.Int {
-    get
-  }
-}
-public struct ProxyConfig {
-  public init(host: Swift.String, port: Swift.Int, username: Swift.String? = nil, password: Swift.String? = nil)
-}
-public protocol RequestInterceptor {
-  func intercept(request: inout Foundation.URLRequest) throws
-}
-public protocol ResponseInterceptor {
-  func intercept(response: Foundation.URLResponse?, data: Foundation.Data?, error: (any Swift.Error)?) -> (Foundation.URLResponse?, Foundation.Data?, (any Swift.Error)?)
-}
 public class PerformanceMonitor {
   public enum Style {
     case dark
@@ -1125,6 +1093,42 @@ public enum EventPriority : Swift.Int, Swift.Codable {
   public static func encrypt(plainText: Swift.String, clientSecret: Swift.String, salt: Swift.String) throws -> Swift.String
   @objc deinit
 }
+@_hasMissingDesignatedInitializers public class AutoEventTracker {
+  public static let shared: IAnalyticsSDK.AutoEventTracker
+  public func enable()
+  public func disable()
+  public func trackViewController(_ viewController: UIKit.UIViewController)
+  public func handlePageView(_ viewController: UIKit.UIViewController)
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers public class NetworkService {
+  public static func get(request: IAnalyticsSDK.NetworkRequest, completion: @escaping (IAnalyticsSDK.NetworkResponse) -> Swift.Void)
+  public static func post(request: IAnalyticsSDK.NetworkRequest, completion: @escaping (IAnalyticsSDK.NetworkResponse) -> Swift.Void)
+  @objc deinit
+}
+@objc public protocol NetDelegate {
+  @objc optional func networkFlow(networkFlow: IAnalyticsSDK.NetworkFlow, catchWithWifiSend wifiSend: Swift.UInt32, wifiReceived: Swift.UInt32, wwanSend: Swift.UInt32, wwanReceived: Swift.UInt32)
+}
+@objc @_inheritsConvenienceInitializers open class NetworkFlow : ObjectiveC.NSObject {
+  weak open var delegate: (any IAnalyticsSDK.NetDelegate)?
+  open func open(with timeInterval: Foundation.TimeInterval = 1)
+  open func close()
+  @objc override dynamic public init()
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers public class DataCompressor {
+  public static func compress(data: Foundation.Data) -> Foundation.Data
+  public static func decompress(data: Foundation.Data) -> Foundation.Data
+  @objc deinit
+}
+public class NetworkReachability {
+  public init?(hostName: Swift.String)
+  public func isReachable() -> Swift.Bool
+  @objc deinit
+}
+extension IAnalyticsSDK.APILogLevel : Swift.Equatable {}
+extension IAnalyticsSDK.APILogLevel : Swift.Hashable {}
+extension IAnalyticsSDK.APILogLevel : Swift.RawRepresentable {}
 extension IAnalyticsSDK.LogType : Swift.Equatable {}
 extension IAnalyticsSDK.LogType : Swift.Hashable {}
 extension IAnalyticsSDK.NetworkType : Swift.Equatable {}
@@ -1142,9 +1146,6 @@ extension IAnalyticsSDK.Device.CPU : Swift.Hashable {}
 extension IAnalyticsSDK.TDKeychainUDIDManager.KeychainError : Swift.Equatable {}
 extension IAnalyticsSDK.TDKeychainUDIDManager.KeychainError : Swift.Hashable {}
 extension IAnalyticsSDK.TDKeychainUDIDManager.KeychainError : Swift.RawRepresentable {}
-extension IAnalyticsSDK.APILogLevel : Swift.Equatable {}
-extension IAnalyticsSDK.APILogLevel : Swift.Hashable {}
-extension IAnalyticsSDK.APILogLevel : Swift.RawRepresentable {}
 extension IAnalyticsSDK.Environment : Swift.Equatable {}
 extension IAnalyticsSDK.Environment : Swift.Hashable {}
 extension IAnalyticsSDK.Environment : Swift.RawRepresentable {}
