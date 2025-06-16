@@ -1,11 +1,12 @@
 //
 //  SceneDelegate.swift
-//  TDSDKDemo
+//  SDKDemo
 //
-//  Created by softlipa on 2025/6/16.
+//  Created by softlipa on 2025/6/11.
 //
 
 import UIKit
+import IAnalyticsSDK
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
@@ -47,6 +48,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // to restore the scene back to its current state.
     }
 
+    func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        guard let url = URLContexts.first?.url else { return }
+        AnalyticsSDK.shared.handleOpenURL(url)
+    }
 
 }
 
